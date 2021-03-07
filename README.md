@@ -11,7 +11,7 @@ At the present the repository contains data and code of:
 
  
 
-## Predicting flake masss: a view from Machine Learning   
+## Predicting flake mass: a view from Machine Learning   
 
 **Reference**   
 Bustos-Pérez, G., Baena, J., 2021. Predicting Flake Mass: A View from Machine Learning. Lithic Technology 14. https://doi.org/10.1080/01977261.2021.1881267    
