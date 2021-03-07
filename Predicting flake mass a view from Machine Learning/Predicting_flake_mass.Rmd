@@ -16,21 +16,31 @@ The data is available in this repository as a **.csv** file. Please note that or
 ```{r}
 # Load packages  
 library(tidyverse)
+```
+```{r message=FALSE, warning=FALSE, include=FALSE}
 library(kableExtra)
 ```
+
 ```{r}
 # Read in data
 Reg_Data <- read.csv2("Data.csv")
 ```
 
+Please note that here the function **kable()** from package **kableExtra** is being employed to visualize imported data. Function **head()** can also be employed.
+
 ```{r echo=FALSE}
 # Instead of head
-kable(Reg_Data[1:5,])
+kable(Reg_Data[1:5,],
+      col.names = gsub("[_]", " ", names(Reg_Data)))
+```
+```{r}
+# Get column names
+colnames(Reg_Data)
 ```
 
 
 ```{r, eval=FALSE}
-Reg_Data_2 <- Reg_Data_2 %>% 
+Reg_Data_2 <- Reg_Data %>% 
   mutate(Log_Weight = log10(Weight),
          Log_Thick = log10(MeanThick),
          Log_SD_Thick = log10(SDThick),

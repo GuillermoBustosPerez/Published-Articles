@@ -14,70 +14,61 @@ that original data uses **“,”** as decimal marker instead of using
 library(tidyverse)
 ```
 
-    ## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --
+    ## -- Attaching packages ------------------------------------------------- tidyverse 1.3.0 --
 
     ## v ggplot2 3.3.2     v purrr   0.3.4
     ## v tibble  3.0.3     v dplyr   1.0.2
     ## v tidyr   1.1.2     v stringr 1.4.0
     ## v readr   1.3.1     v forcats 0.5.0
 
-    ## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+    ## -- Conflicts ---------------------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
-
-``` r
-library(kableExtra)
-```
-
-    ## Warning: package 'kableExtra' was built under R version 4.0.3
-
-    ## 
-    ## Attaching package: 'kableExtra'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     group_rows
 
 ``` r
 # Read in data
 Reg_Data <- read.csv2("Data.csv")
 ```
 
+Please note that here the function **kable()** from package
+**kableExtra** is being employed to visualize imported data. Function
+**head()** can also be employed.
+
 <table>
 <thead>
 <tr>
 <th style="text-align:right;">
-Mean\_Thick
+Mean Thick
 </th>
 <th style="text-align:right;">
-Max\_Thick
+Max Thick
 </th>
 <th style="text-align:right;">
-SD\_Thick
+SD Thick
 </th>
 <th style="text-align:right;">
 Weight
 </th>
 <th style="text-align:right;">
-Surf\_Plat
+Surf Plat
 </th>
 <th style="text-align:right;">
-Surf\_Plat\_II
+Surf Plat II
 </th>
 <th style="text-align:right;">
-Plat\_Depth
+Plat Depth
 </th>
 <th style="text-align:right;">
 Cortex
 </th>
 <th style="text-align:right;">
-Cortex\_Loc
+Cortex Loc
 </th>
 <th style="text-align:right;">
-No\_Scars
+No Scars
 </th>
 <th style="text-align:right;">
-Long\_Ridges
+Long Ridges
 </th>
 <th style="text-align:right;">
 EPA
@@ -297,7 +288,16 @@ IPA
 </table>
 
 ``` r
-Reg_Data_2 <- Reg_Data_2 %>% 
+# Get column names
+colnames(Reg_Data)
+```
+
+    ##  [1] "Mean_Thick"   "Max_Thick"    "SD_Thick"     "Weight"       "Surf_Plat"   
+    ##  [6] "Surf_Plat_II" "Plat_Depth"   "Cortex"       "Cortex_Loc"   "No_Scars"    
+    ## [11] "Long_Ridges"  "EPA"          "IPA"
+
+``` r
+Reg_Data_2 <- Reg_Data %>% 
   mutate(Log_Weight = log10(Weight),
          Log_Thick = log10(MeanThick),
          Log_SD_Thick = log10(SDThick),
