@@ -9,5 +9,29 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1) Read in data    
+## 1) Load packages and Read in data    
+
+The data is available in this repository as a .csv file.
+
+```{r}
+library(tidyverse)
+```
+```{r}
+Reg_Data <- read.csv2("Data.csv")
+```
+
+
+
+
+```{r, eval=FALSE}
+Reg_Data_2 <- Reg_Data_2 %>% 
+  mutate(Log_Weight = log10(Weight),
+         Log_Thick = log10(MeanThick),
+         Log_SD_Thick = log10(SDThick),
+         Log_Plat = log10(Surface.Plat),
+         Log_Plat_2 = log10(Surf_Plat_II),
+         Log_Plat_De = log10(`Platform Deepnes`),
+         Log_EPA = log10(EPA),
+         Log_IPA = log10(IPA)) 
+```
 
