@@ -23,7 +23,10 @@ library(kableExtra)
 Reg_Data <- read.csv2("Data.csv")
 ```
 
-
+```{r echo=FALSE}
+# Instead of head
+kable(Reg_Data[1:5,])
+```
 
 
 ```{r, eval=FALSE}
