@@ -3,11 +3,14 @@ Predicting Flake Mass: A View from Machine Learning. Lithic Technology
 Guillermo Bustos-Pérez
 7/3/2021
 
-## 1) Load packages and Read in data
+## 1) Load packages, read and check data
 
-The data is available in this repository as a .csv file.
+The data is available in this repository as a **.csv** file. Please note
+that original data uses **“,”** as decimal marker instead of using
+**“.”**. Thus, it is required to use the function **read\_csv2**.
 
 ``` r
+# Load packages  
 library(tidyverse)
 ```
 
@@ -23,6 +26,20 @@ library(tidyverse)
     ## x dplyr::lag()    masks stats::lag()
 
 ``` r
+library(kableExtra)
+```
+
+    ## Warning: package 'kableExtra' was built under R version 4.0.3
+
+    ## 
+    ## Attaching package: 'kableExtra'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     group_rows
+
+``` r
+# Read in data
 Reg_Data <- read.csv2("Data.csv")
 ```
 
@@ -37,3 +54,5 @@ Reg_Data_2 <- Reg_Data_2 %>%
          Log_EPA = log10(EPA),
          Log_IPA = log10(IPA)) 
 ```
+
+## References

@@ -9,14 +9,17 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1) Load packages and Read in data    
+## 1) Load packages, read and check data    
 
-The data is available in this repository as a .csv file.
+The data is available in this repository as a **.csv** file. Please note that original data uses **","** as decimal marker instead of using **"."**. Thus, it is required to use the function **read_csv2**.  
 
 ```{r}
+# Load packages  
 library(tidyverse)
+library(kableExtra)
 ```
 ```{r}
+# Read in data
 Reg_Data <- read.csv2("Data.csv")
 ```
 
@@ -34,4 +37,8 @@ Reg_Data_2 <- Reg_Data_2 %>%
          Log_EPA = log10(EPA),
          Log_IPA = log10(IPA)) 
 ```
+
+
+## References   
+
 
