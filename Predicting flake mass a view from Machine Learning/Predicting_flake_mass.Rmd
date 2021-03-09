@@ -37,6 +37,36 @@ kable(Reg_Data[1:5,],
 # Get column names
 colnames(Reg_Data)
 ```
+## Descriptive statistics of experimental assemblage   
+
+The sample consisted of 300 freehand experimental flint flakes knapped using a hard hammer. Flakes belonged to nearly 20 knapping sequences wherein a wide variety of knapping methods were employed – hierarchical (Levallois and hierarchical discoid), bifacial (discoid), and unipolar – to generate the experimental sample, ensuring a wide range of morphologies. All selected flakes from the knapping sequences were complete, and all presented feather terminations. Since a key aspect of the experimentation was to estimate flake mass and independently of exterior factors, hammerstones included a wide selection of limestone, sandstone, and quartzite pebbles, allowing for a diverse range of morphologies and potential active percussion areas.
+
+Summary statistics of the experimental assemblage. Note that **"Platform size1"** refers to platform size measured following Muller and Clarkson (2016); while **"Platform size2"** refers to measures following Andrefsky (2005).
+
+```{r}
+# Make data frame of descriptive statistics of assemblage
+Summary_Assem <- data.frame(
+    rbind(
+      data.frame(data.matrix(summary(Reg_Data$Length))) %>% t(),
+      data.frame(data.matrix(summary(Reg_Data$Width))) %>% t(),
+      data.frame(data.matrix(summary(Reg_Data$Mean_Thick))) %>% t(),
+      data.frame(data.matrix(summary(Reg_Data$Surf_Plat))) %>% t(),
+      data.frame(data.matrix(summary(Reg_Data$Surf_Plat_II))) %>% t(),
+      data.frame(data.matrix(summary(Reg_Data$Weight))) %>% t()
+      ))
+
+# Place column names for each measure
+Measure <- c("Length", "Width", "Mean Thickness", "Platform Surface1",
+             "Platform Surface2", "Weight")
+
+Summary_Assem <- cbind(Measure, Summary_Assem)
+
+rownames(Summary_Assem) <- 1:nrow(Summary_Assem)
+```
+```{r echo=FALSE}
+# Instead of head
+kable(Summary_Assem)
+```
 
 
 ```{r, eval=FALSE}
