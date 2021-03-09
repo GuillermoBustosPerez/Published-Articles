@@ -1,8 +1,9 @@
 # Introduction  
 
-The following repository contains data and code of published articles. Markdowns and Notebooks are intended to provide a synthetic workflow for the data and results published in the corresponding article.    
+The following repository contains data and code of published articles.  
+Markdowns and Notebooks are intended to provide a synthetic workflow for the data and results published in the corresponding articles.    
 
-Please, do not hesitate in contact me at:   
+Please, do not hesitate in contacting me at:   
 guillermo.willbustos@gmail.com   
 
 At the present the repository contains data and code of:  
