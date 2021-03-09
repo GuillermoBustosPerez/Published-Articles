@@ -7,7 +7,9 @@ Guillermo Bustos-Pérez
 
 The data is available in this repository as a **.csv** file. Please note
 that original data uses **“,”** as decimal marker instead of using
-**“.”**. Thus, it is required to use the function **read\_csv2**.
+**“.”**. Thus, it is required to use the function **read\_csv2**. Data
+manipulation and visualization are performed using package **tidyverse**
+(Wickham et al., 2019).
 
 ``` r
 # Load packages  
@@ -539,6 +541,70 @@ Weight
 </tr>
 </tbody>
 </table>
+
+ 
+
+A Bagolini (1968) dispersion graph can be a helpful way to visualize the
+data
+
+``` r
+# Bagolini scatter plot
+Reg_Data %>% 
+  ggplot(aes(Width, Length)) +
+  geom_segment(x = 40, y = 0, xend = 0, yend = 40, color = "gray48") +
+  geom_segment(x = 60, y = 0, xend = 0, yend = 60, color = "gray48") +
+  geom_segment(x = 80, y = 0, xend = 0, yend = 80, color = "gray48") +
+  
+  geom_segment(x = 0, y = 0, xend = 90, yend = 90, color = "gray48") +
+  
+  geom_segment(x = 0, y = 0, xend = (90/6), yend = 90, color = "gray48") +
+  geom_segment(x = 0, y = 0, xend = (90/3), yend = 90, color = "gray48") +
+  geom_segment(x = 0, y = 0, xend = (90/2), yend = 90, color = "gray48") +
+  geom_segment(x = 0, y = 0, xend = (90/1.5), yend = 90, color = "gray48") +
+  geom_segment(x = 0, y = 0, xend = (90/0.75), yend = 90, color = "gray48") +
+  geom_segment(x = 0, y = 0, xend = (90/0.5), yend = 90, color = "gray48") +
+  geom_segment(x = 0, y = 0, xend = 90, yend = (90/2), color = "gray48") +
+  
+  annotate("text", x = 0, y = 89, adj = 0, 
+           label = "Very thin blade", size = 2.5) +
+  annotate("text", x = 17, y = 89, adj = 0, 
+           label = "Thin blade", size = 2.5) +
+  annotate("text", x = 33, y = 89, adj = 0, 
+           label = "Blade", size = 2.5) +
+  annotate("text", x = 44, y = 89, adj = 0, 
+           label = "Elongated flake", size = 2.5) +
+  annotate("text", x = 72, y = 89, adj = 0, 
+           label = "Flake", size = 2.5) +
+  annotate("text", x = 88, y = 80, adj = 0, 
+           label = "Wide\nflake", size = 2.5) +
+  annotate("text", x = 88, y = 53, adj = 0, 
+           label = "Very\nwide\nflake", size = 2.5) +
+  annotate("text", x = 88, y = 25, adj = 0, 
+           label = "Wider\nflake", size = 2.5) +
+  
+  annotate("text", x = 20, y = 1, adj = 0, 
+           label = "Micro", size = 2.5) +
+  annotate("text", x = 47, y = 1, adj = 0, 
+           label = "Small", size = 2.5) +
+  annotate("text", x = 65, y = 1, adj = 0, 
+           label = "Normal", size = 2.5) +
+  annotate("text", x = 85, y = 1, adj = 0, 
+           label = "Big", size = 2.5) +
+  
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = seq(0, 90, 5), lim = c(0, 90)) +
+  scale_y_continuous(breaks = seq(0, 90, 5), lim = c(0, 90)) +
+  ylab("Length (mm)") +
+  xlab("Width (mm)") +
+  theme_light() +
+  labs(color = "") +
+  theme(axis.title = element_text(size = 9, color = "black", face = "bold"),
+        axis.text = element_text(size = 8, color = "black"),
+        legend.position = "bottom") +
+  coord_fixed() 
+```
+
+![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 Reg_Data_2 <- Reg_Data %>% 
