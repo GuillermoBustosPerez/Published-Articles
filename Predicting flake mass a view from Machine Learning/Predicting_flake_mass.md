@@ -334,7 +334,7 @@ colnames(Reg_Data)
     ##  [6] "Weight"       "Surf_Plat"    "Surf_Plat_II" "Plat_Depth"   "Cortex"      
     ## [11] "Cortex_Loc"   "No_Scars"     "Long_Ridges"  "EPA"          "IPA"
 
-## Descriptive statistics of experimental assemblage
+## 2) Descriptive statistics of experimental assemblage
 
 The sample consisted of 300 freehand experimental flint flakes knapped
 using a hard hammer. Flakes belonged to nearly 20 knapping sequences
@@ -347,6 +347,8 @@ the experimentation was to estimate flake mass and independently of
 exterior factors, hammerstones included a wide selection of limestone,
 sandstone, and quartzite pebbles, allowing for a diverse range of
 morphologies and potential active percussion areas.
+
+### 2.1) Descriptive statistics
 
 Summary statistics of the experimental assemblage. Note that **“Platform
 size1”** refers to platform size measured following Muller and Clarkson
@@ -544,8 +546,10 @@ Weight
 
  
 
-A Bagolini (1968) dispersion graph can be a helpful way to visualize the
-data
+### 2.2) Bagolini scatter plot
+
+A Bagolini (1968) scatter plot can be a helpful way to visualize the
+data.
 
 ``` r
 # Bagolini scatter plot
@@ -606,16 +610,43 @@ Reg_Data %>%
 
 ![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
+### 2.3) Calculation of new variables
+
+Previous studies have shown that it is easier to predict log of flake
+mass using log of platform size (Braun et al., 2008; Clarkson & Hiscock,
+2011; Shott et al., 2000). Following this line of approach, logarithmic
+transformations of all variables were included in the dataset, and the
+target variable was the logarithmic transformation of flake weight. In
+the present study, all logarithmic transformations refer to the common
+logarithm (base 10). Log transformations of variables are common, since
+they avoid negative results (necessary in the case of predicting flake
+weight), reduce skewed distributions, and can approximate parametric
+distributions (which favors the inferential power of models).
+
+Log10 transformation of variables and original variables are placed into
+a new data frame. Variables of length and width are removed since they
+would be altered by retouch.
+
 ``` r
+# Calculate log10 transformations of variables and 
+# place into new dataset
 Reg_Data_2 <- Reg_Data %>% 
   mutate(Log_Weight = log10(Weight),
-         Log_Thick = log10(MeanThick),
-         Log_SD_Thick = log10(SDThick),
-         Log_Plat = log10(Surface.Plat),
+         Log_Thick = log10(Mean_Thick),
+         Log_SD_Thick = log10(SD_Thick),
+         Log_Plat = log10(Surf_Plat),
          Log_Plat_2 = log10(Surf_Plat_II),
-         Log_Plat_De = log10(`Platform Deepnes`),
+         Log_Plat_De = log10(Plat_Depth),
          Log_EPA = log10(EPA),
-         Log_IPA = log10(IPA)) 
+         Log_IPA = log10(IPA)) %>% 
+  select(-c(Length, Width))
 ```
+
+## 3) Multiple linear regression and best subset selection
+
+Best subset selection of variables (Furnival & Wilson, 1974; Hastie et
+al., 2009; Hocking & Leslie, 1967) fits separate regression models for
+each of the possible combination of variables, the total number of
+models being equal to 2<sup>*p*</sup> (p being the number of predictors)
 
 ## References
