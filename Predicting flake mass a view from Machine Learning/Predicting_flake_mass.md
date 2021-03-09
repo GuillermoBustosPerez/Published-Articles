@@ -3,6 +3,20 @@ Predicting Flake Mass: A View from Machine Learning. Lithic Technology
 Guillermo Bustos-Pérez
 7/3/2021
 
+## Contents
+
+1.  Load packages, read and check data
+
+2.  Descriptive statistics of experimental assemblage  
+    2.1) Descriptive statistics  
+    2.2) Bagolini scatter plot  
+    2.3) Calculation of new variables
+
+3.  Multiple linear regression and best subset selection  
+    3.1) Best subset selection  
+    3.2) Number of variables  
+    3.3) Variable selection
+
 ## 1) Load packages, read and check data
 
 The data is available in this repository as a **.csv** file. Please note
@@ -632,6 +646,7 @@ would be altered by retouch.
 # place into new dataset
 Reg_Data_2 <- Reg_Data %>% 
   mutate(Log_Weight = log10(Weight),
+         Log_Max_Thick = log10(Max_Thick),
          Log_Thick = log10(Mean_Thick),
          Log_SD_Thick = log10(SD_Thick),
          Log_Plat = log10(Surf_Plat),
@@ -639,7 +654,8 @@ Reg_Data_2 <- Reg_Data %>%
          Log_Plat_De = log10(Plat_Depth),
          Log_EPA = log10(EPA),
          Log_IPA = log10(IPA)) %>% 
-  select(-c(Length, Width))
+  select(-c(Length, Width, Weight,
+            Surf_Plat, Surf_Plat_II))
 ```
 
 ## 3) Multiple linear regression and best subset selection
@@ -648,5 +664,104 @@ Best subset selection of variables (Furnival & Wilson, 1974; Hastie et
 al., 2009; Hocking & Leslie, 1967) fits separate regression models for
 each of the possible combination of variables, the total number of
 models being equal to 2<sup>*p*</sup> (p being the number of predictors)
+
+``` r
+# number of models fitted
+2^(ncol(Reg_Data_2)-1)
+```
+
+    ## [1] 262144
+
+### 3.1) Best subset selection
+
+Best subset selection is performed using the package **“leaps”** (Lumley
+based on Fortran code by Alan Miller, 2020), “caret” (Kuhn, 2008), and
+“broom” (Robinson, 2014).
+
+``` r
+# Load package
+library(leaps)
+
+# Perform best subset
+regfit_full <- regsubsets(Log_Weight ~., 
+                          data = Reg_Data_2,
+                          nvmax = 18)
+reg_summary <- summary(regfit_full)
+```
+
+### 3.2 Number of variables
+
+Selection of number of variables is evaluated using two parameters:
+Mallows’s Cp and adjusted *r*<sup>2</sup>. Mallows’s Cp (Mallows, 1973)
+accounts for model fit in the process of model selection – a low value
+indicates a good model. The addition of predictors results in an
+increasing *r*<sup>2</sup> (proportion of variance of the predicted
+variable explained by the independent variables) irrespective of
+predictor contribution to the model and making it impossible to compare
+models with a different number of predictors.
+
+``` r
+# Plot cp and adjusted rsquared according to n predictors
+data.frame(reg_summary[4], 
+           reg_summary[5],
+           Predictors  = seq(1, 18, 1)) %>% 
+  pivot_longer(c(adjr2, cp),
+               names_to = "Parameters",
+               values_to = "Estimation") %>% 
+  ggplot(aes(Predictors, Estimation, color = Parameters)) +
+    scale_x_continuous(breaks = seq(0, 18, 2), lim = c(1, 18)) +
+  geom_line() +
+  geom_point() +
+  ggsci::scale_color_aaas() +
+  theme_light() +
+  facet_wrap(~Parameters, scales = "free") +
+  theme(legend.position = "none")
+```
+
+![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+Therefore, combined data from adjusted *r*<sup>2</sup> and
+*C*<sub>*p*</sub> indicate that (given the employed variables) the
+optimal model should have between six and eight explanatory variables.
+
+### 3.3 Variable selection
+
+Evaluation of predictor selection and stability following the
+calculation of Cp and adjusted r2 values allows for refinement of the
+model (Figure 3).
+
+``` r
+# Get variable stability using adjusted r2 and Cp ####
+par(mfrow  = c(1,2))
+plot(regfit_full, scale = "adjr2")
+plot(regfit_full, scale = "Cp")
+```
+
+![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+Function to get best variables:
+
+``` r
+# Function to get formula
+
+get_model_formula <- function(id, object, outcome){
+  # get models data
+  models <- summary(object)$which[id,-1]
+  # Get outcome variable
+  #form <- as.formula(object$call[[2]])
+  #outcome <- all.vars(form)[1]
+  # Get model predictors
+  predictors <- names(which(models == TRUE))
+  predictors <- paste(predictors, collapse = "+")
+  # Build model formula
+  as.formula(paste0(outcome, "~", predictors))
+}
+
+# Get best variables
+get_model_formula(7, regfit_full, "Log_Weight")
+```
+
+    ## Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + 
+    ##     Log_Plat + Log_Plat_De
+    ## <environment: 0x0000000015729028>
 
 ## References
