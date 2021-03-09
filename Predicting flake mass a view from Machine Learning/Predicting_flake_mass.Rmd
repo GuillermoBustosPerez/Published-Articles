@@ -268,7 +268,7 @@ Variables selected as predictors are: mean thickness of flake; cortex quantity; 
 frmla <- "Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + Log_Plat + Log_Plat_De"
 ```
 
-First we are going to perform a k-fold cross validation. Although linear models are less prone to overfit it is still of good practice to perform validdations on test sets.  
+First a k-fold cross validation is performed. Although linear models are less prone to overfit it is still of good practice to perform validations on test sets.  
 
 ```{r}
 # Load libraries
@@ -292,7 +292,6 @@ model <- train(Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick
 ```{r}
 # Summarize the results
 summary(model)
-
 ```
 
 
