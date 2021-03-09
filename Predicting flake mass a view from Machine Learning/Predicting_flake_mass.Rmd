@@ -153,7 +153,8 @@ Reg_Data %>%
 
 ### 2.3) Calculation of new variables    
 
-Previous studies have shown that it is easier to predict log of flake mass using log of platform size (Braun et al., 2008; Clarkson & Hiscock, 2011; Shott et al., 2000). Following this line of approach, logarithmic transformations of all variables were included in the dataset, and the target variable was the logarithmic transformation of flake weight. In the present study, all logarithmic transformations refer to the common logarithm (base 10). Log transformations of variables are common, since they avoid negative results (necessary in the case of predicting flake weight), reduce skewed distributions, and can approximate parametric distributions (which favors the inferential power of models).   
+Previous studies have shown that it is easier to predict log of flake mass using log of platform size (Braun et al., 2008; Clarkson & Hiscock, 2011; Shott et al., 2000). Following this line of approach, logarithmic transformations of all variables were included in the dataset, and the target variable was the logarithmic transformation of flake weight. In the present study, all logarithmic transformations refer to the common logarithm (base 10).  
+Log transformations of variables are common, since they avoid negative results (necessary in the case of predicting flake weight), reduce skewed distributions, and can approximate parametric distributions (which favors the inferential power of models).   
 
 Log10 transformation of variables and original variables are placed into a new data frame. Variables of length and width are removed since they would be altered by retouch.  
 
@@ -201,7 +202,9 @@ reg_summary <- summary(regfit_full)
 
 ### 3.2 Number of variables   
 
-Selection of number of variables is evaluated using two parameters: Mallows’s Cp and adjusted $r^2$. Mallows’s Cp (Mallows, 1973) accounts for model fit in the process of model selection – a low value indicates a good model. The addition of predictors results in an increasing $r^2$ (proportion of variance of the predicted variable explained by the independent variables) irrespective of predictor contribution to the model and making it impossible to compare models with a different number of predictors.   
+Selection of number of variables is evaluated using two parameters: Mallows’s Cp and adjusted $r^2$.  
+Mallows’s Cp (Mallows, 1973) accounts for model fit in the process of model selection – a low value indicates a good model.  
+The addition of predictors results in an increasing $r^2$ (proportion of variance of the predicted variable explained by the independent variables) irrespective of predictor contribution to the model and making it impossible to compare models with a different number of predictors. Adjusted $r^2$ is analogous to the linear regression $r^2$ but adjusted to the number of explanatory variables, thus making model comparison possible.   
 
 ```{r, fig.width=9, fig.height=4}
 # Plot cp and adjusted rsquared according to n predictors
@@ -254,6 +257,50 @@ get_model_formula <- function(id, object, outcome){
 
 # Get best variables
 get_model_formula(7, regfit_full, "Log_Weight")
+```
+Variables selected as predictors are: mean thickness of flake; cortex quantity; number of scars; EPA; log of maximum thickness; log of platform size (Muller & Clarkson, 2016); and log of platform depth. Log transformation of maximum thickness is the most commonly selected and stable variable, followed by quantity of cortex and number of scars.  
+
+
+## 4) Evaluation of multiple linear regression model   
+
+```{r}
+# Simplify
+frmla <- "Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + Log_Plat + Log_Plat_De"
+```
+
+First we are going to perform a k-fold cross validation. Although linear models are less prone to overfit it is still of good practice to perform validdations on test sets.  
+
+```{r}
+# Load libraries
+library(lattice); library(caret)
+```
+```{r}
+### Perform K-Fold cross validation
+# Set train control
+train.control <- trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 50)
+
+# Set seed 
+set.seed(123)
+
+# Train the model with caret
+model <- train(Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + Log_Plat + Log_Plat_De, 
+               data = Reg_Data_2, 
+               method = "lm",
+               trControl = train.control)
+```
+```{r}
+# Summarize the results
+summary(model)
+
+```
+
+
+Now we can get some metrics to 
+
+```{r}
+# Get estimates and significance of each variable
+summary(lm(frmla, Reg_Data_2))
 ```
 
 

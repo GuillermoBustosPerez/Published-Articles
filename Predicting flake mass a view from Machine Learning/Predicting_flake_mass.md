@@ -632,10 +632,11 @@ mass using log of platform size (Braun et al., 2008; Clarkson & Hiscock,
 transformations of all variables were included in the dataset, and the
 target variable was the logarithmic transformation of flake weight. In
 the present study, all logarithmic transformations refer to the common
-logarithm (base 10). Log transformations of variables are common, since
-they avoid negative results (necessary in the case of predicting flake
-weight), reduce skewed distributions, and can approximate parametric
-distributions (which favors the inferential power of models).
+logarithm (base 10).  
+Log transformations of variables are common, since they avoid negative
+results (necessary in the case of predicting flake weight), reduce
+skewed distributions, and can approximate parametric distributions
+(which favors the inferential power of models).
 
 Log10 transformation of variables and original variables are placed into
 a new data frame. Variables of length and width are removed since they
@@ -692,13 +693,16 @@ reg_summary <- summary(regfit_full)
 ### 3.2 Number of variables
 
 Selection of number of variables is evaluated using two parameters:
-Mallows’s Cp and adjusted *r*<sup>2</sup>. Mallows’s Cp (Mallows, 1973)
-accounts for model fit in the process of model selection – a low value
-indicates a good model. The addition of predictors results in an
-increasing *r*<sup>2</sup> (proportion of variance of the predicted
-variable explained by the independent variables) irrespective of
-predictor contribution to the model and making it impossible to compare
-models with a different number of predictors.
+Mallows’s Cp and adjusted *r*<sup>2</sup>.  
+Mallows’s Cp (Mallows, 1973) accounts for model fit in the process of
+model selection – a low value indicates a good model.  
+The addition of predictors results in an increasing *r*<sup>2</sup>
+(proportion of variance of the predicted variable explained by the
+independent variables) irrespective of predictor contribution to the
+model and making it impossible to compare models with a different number
+of predictors. Adjusted *r*<sup>2</sup> is analogous to the linear
+regression *r*<sup>2</sup> but adjusted to the number of explanatory
+variables, thus making model comparison possible.
 
 ``` r
 # Plot cp and adjusted rsquared according to n predictors
@@ -762,6 +766,113 @@ get_model_formula(7, regfit_full, "Log_Weight")
 
     ## Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + 
     ##     Log_Plat + Log_Plat_De
-    ## <environment: 0x0000000015729028>
+    ## <environment: 0x0000000015702268>
+
+Variables selected as predictors are: mean thickness of flake; cortex
+quantity; number of scars; EPA; log of maximum thickness; log of
+platform size (Muller & Clarkson, 2016); and log of platform depth. Log
+transformation of maximum thickness is the most commonly selected and
+stable variable, followed by quantity of cortex and number of scars.
+
+## 4) Evaluation of multiple linear regression model
+
+``` r
+# Simplify
+frmla <- "Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + Log_Plat + Log_Plat_De"
+```
+
+First we are going to perform a k-fold cross validation. Although linear
+models are less prone to overfit it is still of good practice to perform
+validdations on test sets.
+
+``` r
+# Load libraries
+library(lattice); library(caret)
+```
+
+    ## 
+    ## Attaching package: 'caret'
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     lift
+
+``` r
+### Perform K-Fold cross validation
+# Set train control
+train.control <- trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 50)
+
+# Set seed 
+set.seed(123)
+
+# Train the model with caret
+model <- train(Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + Log_Plat + Log_Plat_De, 
+               data = Reg_Data_2, 
+               method = "lm",
+               trControl = train.control)
+```
+
+``` r
+# Summarize the results
+summary(model)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = .outcome ~ ., data = dat)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -0.63363 -0.15271 -0.00371  0.15343  0.49169 
+    ## 
+    ## Coefficients:
+    ##                Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   -0.870138   0.162332  -5.360 1.69e-07 ***
+    ## Mean_Thick     0.018865   0.010298   1.832 0.067969 .  
+    ## Cortex        -0.058539   0.012306  -4.757 3.09e-06 ***
+    ## No_Scars       0.059295   0.013266   4.470 1.12e-05 ***
+    ## EPA            0.004387   0.001263   3.474 0.000591 ***
+    ## Log_Max_Thick  1.244264   0.189777   6.556 2.49e-10 ***
+    ## Log_Plat       0.319615   0.065875   4.852 1.99e-06 ***
+    ## Log_Plat_De   -0.415386   0.126108  -3.294 0.001110 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.2156 on 292 degrees of freedom
+    ## Multiple R-squared:  0.7027, Adjusted R-squared:  0.6956 
+    ## F-statistic:  98.6 on 7 and 292 DF,  p-value: < 2.2e-16
+
+Now we can get some metrics to
+
+``` r
+# Get estimates and significance of each variable
+summary(lm(frmla, Reg_Data_2))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = frmla, data = Reg_Data_2)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -0.63363 -0.15271 -0.00371  0.15343  0.49169 
+    ## 
+    ## Coefficients:
+    ##                Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   -0.870138   0.162332  -5.360 1.69e-07 ***
+    ## Mean_Thick     0.018865   0.010298   1.832 0.067969 .  
+    ## Cortex        -0.058539   0.012306  -4.757 3.09e-06 ***
+    ## No_Scars       0.059295   0.013266   4.470 1.12e-05 ***
+    ## EPA            0.004387   0.001263   3.474 0.000591 ***
+    ## Log_Max_Thick  1.244264   0.189777   6.556 2.49e-10 ***
+    ## Log_Plat       0.319615   0.065875   4.852 1.99e-06 ***
+    ## Log_Plat_De   -0.415386   0.126108  -3.294 0.001110 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.2156 on 292 degrees of freedom
+    ## Multiple R-squared:  0.7027, Adjusted R-squared:  0.6956 
+    ## F-statistic:  98.6 on 7 and 292 DF,  p-value: < 2.2e-16
 
 ## References
