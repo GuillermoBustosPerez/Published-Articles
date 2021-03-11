@@ -3,7 +3,7 @@ Predicting Flake Mass: A View from Machine Learning. Lithic Technology
 Guillermo Bustos-Pérez
 7/3/2021
 
-## Contents
+## Table of contents
 
 1.  Load packages, read and check data
 
@@ -16,6 +16,12 @@ Guillermo Bustos-Pérez
     3.1) Best subset selection  
     3.2) Number of variables  
     3.3) Variable selection
+
+4.  Evaluation of multiple linear regression model  
+    4.1) Evaluation metrics  
+    4.2) Visual evaluation of model
+
+5.  References
 
 ## 1) Load packages, read and check data
 
@@ -723,6 +729,7 @@ data.frame(reg_summary[4],
 ```
 
 ![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
 Therefore, combined data from adjusted *r*<sup>2</sup> and
 *C*<sub>*p*</sub> indicate that (given the employed variables) the
 optimal model should have between six and eight explanatory variables.
@@ -766,7 +773,7 @@ get_model_formula(7, regfit_full, "Log_Weight")
 
     ## Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + 
     ##     Log_Plat + Log_Plat_De
-    ## <environment: 0x0000000015702268>
+    ## <environment: 0x0000000009b14630>
 
 Variables selected as predictors are: mean thickness of flake; cortex
 quantity; number of scars; EPA; log of maximum thickness; log of
@@ -776,14 +783,23 @@ stable variable, followed by quantity of cortex and number of scars.
 
 ## 4) Evaluation of multiple linear regression model
 
+Evaluation of a regression model can be differentiated into two related
+parts: metrics and visual analisys.
+
 ``` r
-# Simplify
+# This comes in handy 
 frmla <- "Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + Log_Plat + Log_Plat_De"
 ```
 
-First we are going to perform a k-fold cross validation. Although linear
-models are less prone to overfit it is still of good practice to perform
-validdations on test sets.
+### 4.1) Evaluation metrics
+
+First a k-fold cross validation is performed. Although linear models are
+less prone to overfit it is still of good practice to perform
+validations on test sets.
+
+The use of function **summary()** allows to access details of estimates
+for predictor coefficient, residual distribution and adjusted
+*r*<sup>2</sup>.
 
 ``` r
 # Load libraries
@@ -814,7 +830,7 @@ model <- train(Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick
 ```
 
 ``` r
-# Summarize the results
+# Summary the results
 summary(model)
 ```
 
@@ -843,11 +859,42 @@ summary(model)
     ## Multiple R-squared:  0.7027, Adjusted R-squared:  0.6956 
     ## F-statistic:  98.6 on 7 and 292 DF,  p-value: < 2.2e-16
 
-Now we can get some metrics to
+Now we can calculate additional metrics to evaluate the performance of
+the model. **A good model will have a RMSE lower than the standard
+deviation of the target variable**. This is indicative of the model
+estimating better than taking the average value of the target variable.
 
 ``` r
-# Get estimates and significance of each variable
-summary(lm(frmla, Reg_Data_2))
+# Get metrics of model
+model$results
+```
+
+    ##   intercept      RMSE  Rsquared       MAE     RMSESD RsquaredSD      MAESD
+    ## 1      TRUE 0.2170921 0.6942337 0.1786289 0.02389441 0.08554987 0.02090341
+
+``` r
+# Get standard deviation of target variable
+sd(Reg_Data_2$Log_Weight)
+```
+
+    ## [1] 0.3907031
+
+### 4.2) Visual evaluation of model
+
+We can use the function **augment()** from package **broom** (Robinson,
+2014) to easily access predicted values, true values, residuals and
+original variables. Note that function augment() does not accept a caret
+object. This makes it necessary to train the model using **lm()**.
+Resulting estimates and coefficients are similar (when not identical) to
+the ones from the cross validation.
+
+``` r
+# Train linear model
+set.seed(123)
+lm_model <- lm(frmla, Reg_Data_2)
+
+# Check coefficients
+summary(lm_model)
 ```
 
     ## 
@@ -875,4 +922,166 @@ summary(lm(frmla, Reg_Data_2))
     ## Multiple R-squared:  0.7027, Adjusted R-squared:  0.6956 
     ## F-statistic:  98.6 on 7 and 292 DF,  p-value: < 2.2e-16
 
-## References
+``` r
+# Get residuals, predicted values, etc.
+Model_and_Fitted <- broom::augment(lm_model)
+```
+
+Visualization of plots for the evaluation of regression models is of key
+importance.
+
+-   Plot of predicted and actual values: a good model will have a
+    resgression line with points distributed evenly and continous
+    without systematic errors.  
+-   Plot of actual value and residuals: a good model will have most of
+    the residuals evenly distributed among the 0 value. Positive
+    residuals indicate underestimations of flake mass, and negative
+    residuals indicate overestimations of flake mass.
+
+``` r
+# Regression and residuals scatter plot
+ggpubr::ggarrange(
+  (Model_and_Fitted %>% ggplot(aes(.fitted, Log_Weight)) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_line(aes(y = .fitted), size = 1, col = "blue") +
+  scale_y_continuous(breaks = seq(-0.2, 2, 0.5), lim = c(-0.35, 2)) + 
+  scale_x_continuous(breaks = seq(-0.2, 2, 0.5), lim = c(-0.35, 2)) +
+  ylab("Log of flake mass") +
+  xlab("Predicted log of flake mass") +
+  theme_light() +
+  theme(
+    axis.title = element_text(color = "black", size = 9, face = "bold"),
+    axis.text = element_text(color = "black", size = 8.5))
+  ),
+  (Model_and_Fitted %>% 
+  ggplot(aes(Log_Weight, .resid)) +
+  geom_point(alpha = 0.5, size = 2) +
+  ylab("Residuals") +
+  xlab("Log of flake mass") +
+  scale_y_continuous(breaks = seq(-0.7, 0.7, 0.20), lim = c(-0.7, 0.7)) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  theme_light() +
+  theme(
+    axis.title = element_text(color = "black", size = 9, face = "bold"),
+    axis.text = element_text(color = "black", size = 8.5)
+  )),
+  ncol = 2, align = "h")
+```
+
+![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+Evaluation of the residuals plot shows possible systematic errors when
+log of flake mass is below 0.25, with predictions constantly
+overestimating real log flake mass values. However, this can also be
+attributed to the limited data for that range.  
+Residuals for flakes with a log value of flake mass above 1.5 also to
+present systematic underestimations of flake mass. Residuals from flakes
+with a log value of flake mass between 0.25 and 1.5 present a
+homogeneous distribution.
+
+A **density plot of residuals** provides an additional evaluation of the
+model. Ideal residuals will have an average value of 0 and will have a
+**gaussian distribution**.
+
+``` r
+# Density plot of residuals
+Model_and_Fitted %>% 
+  ggplot(aes(.resid)) +
+  geom_density(color = "blue") +
+  ylab("Density") +
+  xlab("Residuals") +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_hline(yintercept = 0) +
+  theme_light() +
+  theme(
+    axis.title = element_text(color = "black", size = 9, face = "bold"),
+    axis.text = element_text(color = "black", size = 8.5)
+  )
+```
+
+![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+Error rate (Davis and Shea, 1998) can be calculated and plotted to
+further evaluate the model.
+
+``` r
+# Calculate and plot error rate
+Model_and_Fitted %>% transmute(
+  Error_Rate = ((.fitted - Log_Weight)/Log_Weight)*100) %>% 
+  ggplot(
+  aes(Error_Rate)) +
+  geom_density(color = "red") +
+  theme_light() +
+  ylab("Density") +
+  xlab("Error rate (%)") +
+  theme(
+    axis.title = element_text(color = "black", size = 9, face = "bold"),
+    axis.text = element_text(color = "black", size = 8.5)
+  )
+```
+
+![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+
+## 5) References
+
+Andrefsky, W., 2005. Lithics Macroscopic Approaches to Analysis, Second.
+ed, Cambridge Manuals in Archaeology. Cambridge University Press,
+Cambridge.
+
+Bagolini, B., 1968. Ricerche sulle dimensioni dei manufatti litici
+preistorici non ritoccati. Annali dell’Università di Ferrara : nuova
+serie, Sezione XV. Paleontologia Umana e Paletnologia 1, 195–219.
+
+Braun, D.R., Rogers, M.J., Harris, J.W.K., Walker, S.J., 2008.
+Landscape-scale variation in hominin tool use: Evidence from the
+Developed Oldowan. Journal of Human Evolution 55, 1053–1063.
+<https://doi.org/10.1016/j.jhevol.2008.05.020>
+
+Clarkson, C., Hiscock, P., 2011. Estimating original flake mass from 3D
+scans of platform area. Journal of Archaeological Science 38, 1062–1068.
+<https://doi.org/10.1016/j.jas.2010.12.001>
+
+Davis, Z.J., Shea, J.J., 1998. Quantifying Lithic Curation: An
+Experimental Test of Dibble and Pelcin’s Original Flake-Tool Mass
+Predictor. Journal of Archaeological Science 25, 603–610.
+<https://doi.org/10.1006/jasc.1997.0255>
+
+Furnival, G.M., Wilson, R.W., 1974. Regressions by Leaps and Bounds.
+Technometrics 16, 499–511.
+
+Hastie, T., Tibshirani, R., Friedman, J., 2009. The Elements of
+Statistical Learning. Data Mining, Inference, and Prediction, Second
+Edition. ed, Springer Series in Statistics. Springer.
+
+Hocking, R.R., Leslie, R.N., 1967. Selection of the Best Subset in
+Regression Analysis. Technometrics 9, 531–540.
+
+Kuhn, M., 2008. Building Predictive Models in R using the caret Package.
+Journal of Statistical Software 28.
+<https://doi.org/10.18637/jss.v028.i05>
+
+Lumley based on Fortran code by Alan Miller, T., 2020. leaps: Regression
+Subset Selection.
+
+Mallows, C.L., 1973. Some Comments on Cp. Technometrics 15, 661–675.
+
+Muller, A., Clarkson, C., 2016. A new method for accurately and
+precisely measuring flake platform area. Journal of Archaeological
+Science: Reports 8, 178–186.
+<https://doi.org/10.1016/j.jasrep.2016.06.015>
+
+Robinson, D., 2014. broom: An R Package for Converting Statistical
+Analysis Objects Into Tidy Data Frames. arXiv: Computation.
+<https://doi.org/arXiv:1412.3565>
+
+Shott, M.J., Bradbury, A.P., Carr, P.J., Odell, G.H., 2000. Flake Size
+from Platform Attributes: Predictive and Empirical Approaches. Journal
+of Archaeological Science 27, 877–894.
+<https://doi.org/10.1006/jasc.1999.0499>
+
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François,
+R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen,
+T., Miller, E., Bache, S., Müller, K., Ooms, J., Robinson, D., Seidel,
+D., Spinu, V., Takahashi, K., Vaughan, D., Wilke, C., Woo, K., Yutani,
+H., 2019. Welcome to the Tidyverse. Journal of Open Source Software 4,
+1686. <https://doi.org/10.21105/joss.01686>

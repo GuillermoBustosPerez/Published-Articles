@@ -223,6 +223,7 @@ data.frame(reg_summary[4],
   facet_wrap(~Parameters, scales = "free") +
   theme(legend.position = "none")
 ```
+   
 Therefore, combined data from adjusted $r^2$ and $C_p$ indicate that (given the employed variables) the optimal model should have between six and eight explanatory variables.
 
 
@@ -292,6 +293,8 @@ model <- train(Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick
 ```{r}
 # Summarize the results
 summary(model)
+
+model$results
 ```
 
 
