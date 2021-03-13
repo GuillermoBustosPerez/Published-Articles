@@ -9,6 +9,10 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Please cite as:  
+Bustos-Pérez, G., Baena, J., 2021. Predicting Flake Mass: A View from Machine Learning. Lithic Technology 14. https://doi.org/10.1080/01977261.2021.1881267   
+
+
 ## Table of contents   
 
 1) Load packages, read and check data   

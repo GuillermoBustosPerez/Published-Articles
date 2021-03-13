@@ -3,6 +3,11 @@ Predicting Flake Mass: A View from Machine Learning. Lithic Technology
 Guillermo Bustos-Pérez
 7/3/2021
 
+Please cite as:  
+Bustos-Pérez, G., Baena, J., 2021. Predicting Flake Mass: A View from
+Machine Learning. Lithic Technology 14.
+<https://doi.org/10.1080/01977261.2021.1881267>
+
 ## Table of contents
 
 1.  Load packages, read and check data
@@ -773,7 +778,7 @@ get_model_formula(7, regfit_full, "Log_Weight")
 
     ## Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + 
     ##     Log_Plat + Log_Plat_De
-    ## <environment: 0x00000000147dd1d8>
+    ## <environment: 0x00000000147c7658>
 
 Variables selected as predictors are: mean thickness of flake; cortex
 quantity; number of scars; EPA; log of maximum thickness; log of
