@@ -773,7 +773,7 @@ get_model_formula(7, regfit_full, "Log_Weight")
 
     ## Log_Weight ~ Mean_Thick + Cortex + No_Scars + EPA + Log_Max_Thick + 
     ##     Log_Plat + Log_Plat_De
-    ## <environment: 0x0000000009b14630>
+    ## <environment: 0x00000000147dd1d8>
 
 Variables selected as predictors are: mean thickness of flake; cortex
 quantity; number of scars; EPA; log of maximum thickness; log of
@@ -974,9 +974,9 @@ Evaluation of the residuals plot shows possible systematic errors when
 log of flake mass is below 0.25, with predictions constantly
 overestimating real log flake mass values. However, this can also be
 attributed to the limited data for that range.  
-Residuals for flakes with a log value of flake mass above 1.5 also to
-present systematic underestimations of flake mass. Residuals from flakes
-with a log value of flake mass between 0.25 and 1.5 present a
+Residuals for flakes with a log value of flake mass above 1.5 also seem
+to present systematic underestimations of flake mass. Residuals from
+flakes with a log value of flake mass between 0.25 and 1.5 present a
 homogeneous distribution.
 
 A **density plot of residuals** provides an additional evaluation of the
@@ -1021,6 +1021,24 @@ Model_and_Fitted %>% transmute(
 ```
 
 ![](Predicting_flake_mass_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+
+Summary statistics of error rate can easily be accessed.
+
+``` r
+# Summary statistics of error rate
+summary(Model_and_Fitted %>% 
+          transmute(
+            Error_Rate = ((.fitted - Log_Weight)/Log_Weight)*100)
+        )
+```
+
+    ##    Error_Rate       
+    ##  Min.   :-1916.701  
+    ##  1st Qu.:  -14.754  
+    ##  Median :   -1.083  
+    ##  Mean   :    4.420  
+    ##  3rd Qu.:   18.609  
+    ##  Max.   : 1113.489
 
 ## 5) References
 

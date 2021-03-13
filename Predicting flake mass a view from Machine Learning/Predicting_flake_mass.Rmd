@@ -369,7 +369,7 @@ ggpubr::ggarrange(
 ```
 
 Evaluation of the residuals plot shows possible systematic errors when log of flake mass is below 0.25, with predictions constantly overestimating real log flake mass values. However, this can also be attributed to the limited data for that range.  
-Residuals for flakes with a log value of flake mass above 1.5 also to present systematic underestimations of flake mass. Residuals from flakes with a log value of flake mass between 0.25 and 1.5 present a homogeneous distribution.  
+Residuals for flakes with a log value of flake mass above 1.5 also seem to present systematic underestimations of flake mass. Residuals from flakes with a log value of flake mass between 0.25 and 1.5 present a homogeneous distribution.  
 
 A **density plot of residuals** provides an additional evaluation of the model. Ideal residuals will have an average  value of 0 and will have a **gaussian distribution**.  
 
@@ -408,6 +408,15 @@ Model_and_Fitted %>% transmute(
   )
 ```
 
+Summary statistics of error rate can easily be accessed. 
+
+```{r}
+# Summary statistics of error rate
+summary(Model_and_Fitted %>% 
+          transmute(
+            Error_Rate = ((.fitted - Log_Weight)/Log_Weight)*100)
+        )
+```
 
 
 ## 5) References   
